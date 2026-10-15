@@ -1,0 +1,37 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-ohljrK_x.js
+var tsrStartManifest = () => ({ routes: {
+	__root__: {
+		filePath: "D:/Projects/energy-hunter-full/src/routes/__root.tsx",
+		children: [
+			"/",
+			"/login",
+			"/api/auth/$"
+		],
+		preloads: ["/assets/index-ChjLO_iS.js", "/assets/react-DB-4Zxce.js"],
+		scripts: [{ attrs: {
+			type: "module",
+			async: !0,
+			src: "/assets/index-ChjLO_iS.js"
+		} }]
+	},
+	"/": {
+		filePath: "D:/Projects/energy-hunter-full/src/routes/index.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/routes-BHJ_064V.js",
+			"/assets/field-DdeJKZ_a.js",
+			"/assets/client-cLw6edTc.js"
+		]
+	},
+	"/login": {
+		filePath: "D:/Projects/energy-hunter-full/src/routes/login.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/login-CJDzJwPj.js",
+			"/assets/field-DdeJKZ_a.js",
+			"/assets/client-cLw6edTc.js"
+		]
+	}
+} });
+//#endregion
+export { tsrStartManifest };

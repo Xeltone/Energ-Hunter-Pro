@@ -1,0 +1,136 @@
+import { i as TSS_SERVER_FUNCTION, r as createServerFn } from "./ssr.mjs";
+import { F as object, R as string, k as array } from "../_libs/@better-auth/core+[...].mjs";
+import { r as getSql } from "./db-DIz_oGKy.mjs";
+import { n as drinkSchema, t as authMiddleware } from "./data-CLTXxVDP.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/server-CDLtUno7.js
+var createServerRpc = (serverFnMeta, splitImportFn) => {
+	const url = "/_serverFn/" + serverFnMeta.id;
+	return Object.assign(splitImportFn, {
+		url,
+		serverFnMeta,
+		[TSS_SERVER_FUNCTION]: true
+	});
+};
+function mapRow(r) {
+	return {
+		id: r.id,
+		name: r.name,
+		flavor: r.flavor || "",
+		status: r.status === "collection" ? "collection" : "drank",
+		date: r.date || "",
+		rating: {
+			taste: Number(r.taste) || 0,
+			effect: Number(r.effect) || 0,
+			design: Number(r.design) || 0,
+			value: Number(r.value) || 0
+		},
+		notes: r.notes || "",
+		volume: Number(r.volume) || 0,
+		caffeine: Number(r.caffeine) || 0,
+		sugar: r.sugar === null || r.sugar === void 0 ? null : Number(r.sugar),
+		price: Number(r.price) || 0,
+		store: r.store || "",
+		image: r.image_url || ""
+	};
+}
+var listMyDrinks_createServerFn_handler = createServerRpc({
+	id: "287b075444be5964fd836f3befbf246ea73dc0f9e1df5b08302c2cb9bbda8322",
+	name: "listMyDrinks",
+	filename: "src/lib/drinks/server.ts"
+}, (opts) => listMyDrinks.__executeServer(opts));
+var listMyDrinks = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(listMyDrinks_createServerFn_handler, async ({ context }) => {
+	return (await (await getSql())`
+      select id, name, flavor, status, date, taste, effect, design, value,
+             notes, volume, caffeine, sugar, price, store, image_url
+      from drinks
+      where user_id = ${context.userId}
+      order by date desc nulls last, created_at desc
+    `).map(mapRow);
+});
+var upsertDrink_createServerFn_handler = createServerRpc({
+	id: "77781f3d5ebacbba903b67db92a2fdf86c5b45a76db62fa313f0cfe4ea2289a3",
+	name: "upsertDrink",
+	filename: "src/lib/drinks/server.ts"
+}, (opts) => upsertDrink.__executeServer(opts));
+var upsertDrink = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator(drinkSchema).handler(upsertDrink_createServerFn_handler, async ({ context, data }) => {
+	await (await getSql())`
+      insert into drinks (
+        id, user_id, name, flavor, status, date, taste, effect, design, value,
+        notes, volume, caffeine, sugar, price, store, image_url
+      ) values (
+        ${data.id}, ${context.userId}, ${data.name}, ${data.flavor}, ${data.status},
+        ${data.date || null}, ${data.rating.taste}, ${data.rating.effect},
+        ${data.rating.design}, ${data.rating.value}, ${data.notes},
+        ${data.volume}, ${data.caffeine}, ${data.sugar}, ${data.price}, ${data.store}, ${data.image}
+      )
+      on conflict (id) do update set
+        name = excluded.name,
+        flavor = excluded.flavor,
+        status = excluded.status,
+        date = excluded.date,
+        taste = excluded.taste,
+        effect = excluded.effect,
+        design = excluded.design,
+        value = excluded.value,
+        notes = excluded.notes,
+        volume = excluded.volume,
+        caffeine = excluded.caffeine,
+        sugar = excluded.sugar,
+        price = excluded.price,
+        store = excluded.store,
+        image_url = excluded.image_url
+      where drinks.user_id = ${context.userId}
+    `;
+	return { ok: true };
+});
+var removeDrink_createServerFn_handler = createServerRpc({
+	id: "76ee50bc2f54c5a3ccc71cddc7b0af5d39fa4d5f464d099b76b05fc5ea531440",
+	name: "removeDrink",
+	filename: "src/lib/drinks/server.ts"
+}, (opts) => removeDrink.__executeServer(opts));
+var removeDrink = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator(object({ id: string().min(1) })).handler(removeDrink_createServerFn_handler, async ({ context, data }) => {
+	await (await getSql())`delete from drinks where id = ${data.id} and user_id = ${context.userId}`;
+	return { ok: true };
+});
+var replaceMyDrinks_createServerFn_handler = createServerRpc({
+	id: "34936bc4b8fad7153f14ebf2d01e4e1aeae7233a4f0a58d4fe034f7f3c354f57",
+	name: "replaceMyDrinks",
+	filename: "src/lib/drinks/server.ts"
+}, (opts) => replaceMyDrinks.__executeServer(opts));
+var replaceMyDrinks = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator(object({ drinks: array(drinkSchema).max(2e3) })).handler(replaceMyDrinks_createServerFn_handler, async ({ context, data }) => {
+	const sql = await getSql();
+	await sql`delete from drinks where user_id = ${context.userId}`;
+	for (const d of data.drinks) await sql`
+        insert into drinks (
+          id, user_id, name, flavor, status, date, taste, effect, design, value,
+          notes, volume, caffeine, sugar, price, store, image_url
+        ) values (
+          ${d.id}, ${context.userId}, ${d.name}, ${d.flavor}, ${d.status},
+          ${d.date || null}, ${d.rating.taste}, ${d.rating.effect},
+          ${d.rating.design}, ${d.rating.value}, ${d.notes},
+          ${d.volume}, ${d.caffeine}, ${d.sugar}, ${d.price}, ${d.store}, ${d.image}
+        )
+      `;
+	return { count: data.drinks.length };
+});
+var fetchLeaderboard_createServerFn_handler = createServerRpc({
+	id: "91fc35a52635399969128db1f4df5b6a4f85f107c16339e8428d00a63e930905",
+	name: "fetchLeaderboard",
+	filename: "src/lib/drinks/server.ts"
+}, (opts) => fetchLeaderboard.__executeServer(opts));
+var fetchLeaderboard = createServerFn({ method: "GET" }).handler(fetchLeaderboard_createServerFn_handler, async () => {
+	return (await (await getSql())`
+      select u.id, u.name, count(d.id)::int as drink_count
+      from "user" u
+      left join drinks d on d.user_id = u.id and d.status = 'drank'
+      group by u.id, u.name
+      order by drink_count desc, u.name asc
+      limit 50
+    `).map((r) => ({
+		id: r.id,
+		name: r.name,
+		drinkCount: Number(r.drink_count) || 0
+	}));
+});
+//#endregion
+export { fetchLeaderboard_createServerFn_handler, listMyDrinks_createServerFn_handler, removeDrink_createServerFn_handler, replaceMyDrinks_createServerFn_handler, upsertDrink_createServerFn_handler };
